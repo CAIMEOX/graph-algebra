@@ -3,25 +3,25 @@ type VertRep Error
 
 ///|
 trait Vertex {
-  unwrap(VertRep) -> Self
-  wrap(Self) -> VertRep
+  extract(VertRep) -> Self
+  rep(Self) -> VertRep
 }
 
 ///|
-impl Vertex for VertRep with unwrap(self) {
+impl Vertex for VertRep with extract(self) {
   match self {
     VertRep(x) => x
   }
 }
 
 ///|
-impl Vertex for VertRep with wrap(self) { self }
+impl Vertex for VertRep with rep(self) { self }
 
 ///|
 type! StringVertex String
 
 ///|
-impl Vertex for String with unwrap(self) {
+impl Vertex for String with extract(self) {
   match self {
     VertRep(StringVertex(x)) => x
     _ => abort("Expected StringVertex")
@@ -29,13 +29,13 @@ impl Vertex for String with unwrap(self) {
 }
 
 ///|
-impl Vertex for String with wrap(self) { VertRep(StringVertex(self)) }
+impl Vertex for String with rep(self) { VertRep(StringVertex(self)) }
 
 ///|
 type! IntVertex Int
 
 ///|
-impl Vertex for Int with unwrap(self) {
+impl Vertex for Int with extract(self) {
   match self {
     VertRep(IntVertex(x)) => x
     _ => abort("Expected IntVertex")
@@ -43,7 +43,7 @@ impl Vertex for Int with unwrap(self) {
 }
 
 ///|
-impl Vertex for Int with wrap(self) { VertRep(IntVertex(self)) }
+impl Vertex for Int with rep(self) { VertRep(IntVertex(self)) }
 
 test "string vertex" {
   let x : Array[String] = ["a", "b", "c"]

@@ -29,7 +29,7 @@ impl[A : Compare + Vertex] Graph for Relation[A] with empty() {
 
 ///|
 impl[A : Compare + Vertex] Graph for Relation[A] with vertex(v) {
-  { domain: Set::from_array([Vertex::unwrap(v)]), relation: Set::new() }
+  { domain: Set::from_array([Vertex::extract(v)]), relation: Set::new() }
 }
 
 ///|
