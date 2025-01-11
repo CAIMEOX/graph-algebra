@@ -30,7 +30,7 @@ impl[A : Show] Show for GraphData[A] with to_string(self) {
 
 ///|
 impl[A : Show] Show for GraphData[A] with output(x, logger) {
-  logger.write_object(x.to_string())
+  logger.write_string(x.to_string())
 }
 
 ///|

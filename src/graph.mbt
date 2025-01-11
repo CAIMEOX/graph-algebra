@@ -119,8 +119,16 @@ impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with connect(x, y) {
 
 ///|
 pub fn induce[G : Graph, V : Vertex](
-  pred : (V) -> Bool,
-  m : GraphMonad[G, V]
+  self : GraphMonad[G, V],
+  pred : (V) -> Bool
 ) -> G {
-  m.bind(fn(v) { if pred(v) { G::vertex(v.rep()) } else { Graph::empty() } })
+  self.bind(fn(v) { if pred(v) { G::vertex(v.rep()) } else { Graph::empty() } })
+}
+
+///|
+pub fn remove_vertex[G : Graph, V : Vertex + Eq](
+  self : GraphMonad[G, V],
+  v : V
+) -> G {
+  self.induce(fn(x) { x != v })
 }

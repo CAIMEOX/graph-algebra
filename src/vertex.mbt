@@ -76,8 +76,6 @@ test "int vertex" {
   )
   inspect!(
     z1,
-    content=
-      "Rel[@immut/sorted_set.of([1, 2, 3]), @immut/sorted_set.of([(1, 2), (1, 3), (2, 3)])]"
-    ,
+    content="Rel[@immut/sorted_set.of([1, 2, 3]), @immut/sorted_set.of([(1, 2), (1, 3), (2, 3)])]",
   )
 }
