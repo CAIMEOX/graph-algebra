@@ -1,0 +1,32 @@
+package CAIMEOX/graph-algebra
+
+// Values
+fn clique[A : Graph, V : Vertex](Array[V]) -> A
+
+fn connects[A : Graph, V : Vertex](Array[V]) -> A
+
+fn edge[A : Graph, V : Vertex](V, V) -> A
+
+fn vertices[A : Graph, V : Vertex](Array[V]) -> A
+
+// Types and methods
+type GraphData
+impl GraphData {
+  fold[A : Graph, V : Vertex](Self[V]) -> A
+}
+
+type IntVertex
+
+type Relation
+
+type StringVertex
+
+type VertRep
+
+// Type aliases
+
+// Traits
+trait Graph
+
+trait Vertex
+
