@@ -1,18 +1,51 @@
 package CAIMEOX/graph-algebra
 
 // Values
+fn biclique[A : Graph, V : Vertex](Array[V], Array[V]) -> A
+
 fn clique[A : Graph, V : Vertex](Array[V]) -> A
 
 fn connects[A : Graph, V : Vertex](Array[V]) -> A
 
 fn edge[A : Graph, V : Vertex](V, V) -> A
 
+fn edges[A : Graph, V : Vertex](Array[(V, V)]) -> A
+
+fn empty[A]() -> GraphData[A]
+
+fn is_subgraph[A : Graph + Eq](A, A) -> Bool
+
+fn overlay[A](GraphData[A], GraphData[A]) -> GraphData[A]
+
+fn path[A : Graph, V : Vertex](Array[V]) -> A
+
+fn pure[A : Vertex](A) -> GraphData[A]
+
+fn star[A : Graph, V : Vertex](V, Array[V]) -> A
+
+fn transform[A : Graph, V : Vertex](V) -> A
+
 fn vertices[A : Graph, V : Vertex](Array[V]) -> A
 
 // Types and methods
 type GraphData
 impl GraphData {
+  bind[V, W](Self[V], (V) -> Self[W]) -> Self[W]
   fold[A : Graph, V : Vertex](Self[V]) -> A
+  fold_graph[V, B](Self[V], B, (V) -> B, (B, B) -> B, (B, B) -> B) -> B
+  has_vertex[A : Eq](Self[A], A) -> Bool
+  is_empty[A](Self[A]) -> Bool
+  map[V, W](Self[V], (V) -> W) -> Self[W]
+}
+impl[A : Eq] Eq for GraphData[A]
+
+type GraphFunctor
+
+type GraphMonad
+impl GraphMonad {
+  bind[G : Graph, V : Vertex](Self[G, V], (V) -> G) -> G
+  induce[G : Graph, V : Vertex](Self[G, V], (V) -> Bool) -> G
+  remove_vertex[G : Graph, V : Vertex + Eq](Self[G, V], V) -> G
 }
 
 type IntVertex
@@ -20,6 +53,8 @@ type IntVertex
 type Relation
 
 type StringVertex
+
+type ToList
 
 type VertRep
 

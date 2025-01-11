@@ -132,3 +132,20 @@ pub fn remove_vertex[G : Graph, V : Vertex + Eq](
 ) -> G {
   self.induce(fn(x) { x != v })
 }
+
+///|
+pub fn biclique[A : Graph, V : Vertex](x : Array[V], y : Array[V]) -> A {
+  match (x, y) {
+    ([], ys) => vertices(ys)
+    (xs, []) => vertices(xs)
+    (xs, ys) => A::connect(vertices(xs), vertices(ys))
+  }
+}
+
+///|
+pub fn star[A : Graph, V : Vertex](x : V, ys : Array[V]) -> A {
+  match ys {
+    [] => A::vertex(x.rep())
+    _ => A::connect(A::vertex(x.rep()), vertices(ys))
+  }
+}
