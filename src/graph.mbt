@@ -6,6 +6,16 @@ trait Graph {
   connect(Self, Self) -> Self
 }
 
+test "graph functor" {
+  let a = [1, 2, 3, 4]
+  let x : GraphFunctor[GraphData[Int], Int, Int] = clique(a)
+  let x1 : GraphFunctor[GraphData[Unit], Int, Unit] = clique(a)
+  let y = x.graph_map(fn(p) { p + 100 })
+  let y1 = x1.graph_map(fn(p) { () })
+  inspect!(y, content="(((($e -> 101) -> 102) -> 103) -> 104)")
+  inspect!(y1, content="(((($e -> ()) -> ()) -> ()) -> ())")
+}
+
 ///|
 pub fn vertices[A : Graph, V : Vertex](x : Array[V]) -> A {
   x.map(transform).fold(init=Graph::empty(), Graph::overlay)
@@ -55,34 +65,44 @@ pub fn path[A : Graph, V : Vertex](x : Array[V]) -> A {
 }
 
 ///|
-struct GraphFunctor[G, V] {
-  g_for : ((V) -> V) -> G
+struct GraphFunctor[G, V, W] {
+  g_for : ((V) -> W) -> G
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphFunctor[G, V] with empty() {
+impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with empty(
+
+) {
   { g_for: fn(_) { G::empty() } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphFunctor[G, V] with vertex(x) {
-  { g_for: fn(f) { G::vertex(f(V::extract(x)).rep()) } }
+impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with vertex(
+  x
+) {
+  { g_for: fn(f) { G::vertex(W::rep(f(V::extract(x)))) } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphFunctor[G, V] with overlay(x, y) {
+impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with overlay(
+  x,
+  y
+) {
   { g_for: fn(f) { G::overlay(graph_map(x, f), graph_map(y, f)) } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphFunctor[G, V] with connect(x, y) {
+impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with connect(
+  x,
+  y
+) {
   { g_for: fn(f) { G::connect(graph_map(x, f), graph_map(y, f)) } }
 }
 
 ///|
-fn graph_map[G : Graph, V : Vertex](
-  self : GraphFunctor[G, V],
-  f : (V) -> V
+fn graph_map[G : Graph, V : Vertex, W : Vertex](
+  self : GraphFunctor[G, V, W],
+  f : (V) -> W
 ) -> G {
   (self.g_for)(f)
 }
