@@ -1,8 +1,8 @@
 ///|
-type VertRep Error
+pub type VertRep Error
 
 ///|
-trait Vertex {
+pub trait Vertex {
   extract(VertRep) -> Self
   rep(Self) -> VertRep
 }

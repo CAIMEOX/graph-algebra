@@ -1,5 +1,5 @@
 ///|
-trait Graph {
+pub trait Graph {
   empty() -> Self
   vertex(VertRep) -> Self
   overlay(Self, Self) -> Self
@@ -18,16 +18,16 @@ test "graph functor" {
 
 ///|
 pub fn vertices[A : Graph, V : Vertex](x : Array[V]) -> A {
-  x.map(transform).fold(init=Graph::empty(), Graph::overlay)
+  x.map(singleton).fold(init=Graph::empty(), Graph::overlay)
 }
 
 ///|
 pub fn connects[A : Graph, V : Vertex](x : Array[V]) -> A {
-  x.map(transform).fold(init=Graph::empty(), Graph::connect)
+  x.map(singleton).fold(init=Graph::empty(), Graph::connect)
 }
 
 ///|
-pub fn transform[A : Graph, V : Vertex](v : V) -> A {
+pub fn singleton[A : Graph, V : Vertex](v : V) -> A {
   Graph::vertex(v.rep())
 }
 
@@ -38,7 +38,7 @@ pub fn edge[A : Graph, V : Vertex](x : V, y : V) -> A {
 
 ///|
 pub fn clique[A : Graph, V : Vertex](x : Array[V]) -> A {
-  x.map(transform).fold(init=Graph::empty(), Graph::connect)
+  x.map(singleton).fold(init=Graph::empty(), Graph::connect)
 }
 
 ///|
@@ -164,7 +164,7 @@ test "induce" {
   let x = [1, 2, 3, 4]
   let y : GraphMonad[GraphData[Int], Int] = clique(x)
   let z = y.induce(fn(v) { v % 2 == 0 })
-  inspect!(z.simple_rewrite(), content="(($e -> 2) -> 4)")
+  inspect!(z, content="(((($e -> $e) -> 2) -> $e) -> 4)")
 }
 
 ///|
