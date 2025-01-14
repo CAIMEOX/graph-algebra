@@ -1,0 +1,31 @@
+package CAIMEOX/graph-algebra/instance
+
+alias @CAIMEOX/graph-algebra as @graph-algebra
+
+// Values
+fn connect[A](GraphData[A], GraphData[A]) -> GraphData[A]
+
+fn empty[A]() -> GraphData[A]
+
+fn overlay[A](GraphData[A], GraphData[A]) -> GraphData[A]
+
+fn pure[A : @graph-algebra.Vertex](A) -> GraphData[A]
+
+// Types and methods
+type GraphData
+impl GraphData {
+  bind[V, W](Self[V], (V) -> Self[W]) -> Self[W]
+  fold[A : @graph-algebra.Graph, V : @graph-algebra.Vertex](Self[V]) -> A
+  fold_graph[V, B](Self[V], B, (V) -> B, (B, B) -> B, (B, B) -> B) -> B
+  has_vertex[A : Eq](Self[A], A) -> Bool
+  is_empty[A](Self[A]) -> Bool
+  map[V, W](Self[V], (V) -> W) -> Self[W]
+}
+impl[A : Eq] Eq for GraphData[A]
+
+type Relation
+
+// Type aliases
+
+// Traits
+

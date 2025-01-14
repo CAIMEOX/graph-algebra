@@ -1,0 +1,8 @@
+{
+  "import": [
+    {
+      "alias": "alga",
+      "path": "CAIMEOX/graph-algebra"
+    }
+  ]
+}

@@ -11,35 +11,22 @@ fn edge[A : Graph, V : Vertex](V, V) -> A
 
 fn edges[A : Graph, V : Vertex](Array[(V, V)]) -> A
 
-fn empty[A]() -> GraphData[A]
-
 fn is_subgraph[A : Graph + Eq](A, A) -> Bool
-
-fn overlay[A](GraphData[A], GraphData[A]) -> GraphData[A]
 
 fn path[A : Graph, V : Vertex](Array[V]) -> A
 
-fn pure[A : Vertex](A) -> GraphData[A]
+fn singleton[A : Graph, V : Vertex](V) -> A
 
 fn star[A : Graph, V : Vertex](V, Array[V]) -> A
-
-fn transform[A : Graph, V : Vertex](V) -> A
 
 fn vertices[A : Graph, V : Vertex](Array[V]) -> A
 
 // Types and methods
-type GraphData
-impl GraphData {
-  bind[V, W](Self[V], (V) -> Self[W]) -> Self[W]
-  fold[A : Graph, V : Vertex](Self[V]) -> A
-  fold_graph[V, B](Self[V], B, (V) -> B, (B, B) -> B, (B, B) -> B) -> B
-  has_vertex[A : Eq](Self[A], A) -> Bool
-  is_empty[A](Self[A]) -> Bool
-  map[V, W](Self[V], (V) -> W) -> Self[W]
-}
-impl[A : Eq] Eq for GraphData[A]
-
 type GraphFunctor
+impl GraphFunctor {
+  graph_map[G : Graph, V : Vertex, W : Vertex](Self[G, V, W], (V) -> W) -> G
+}
+impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W]
 
 type GraphMonad
 impl GraphMonad {
@@ -47,21 +34,34 @@ impl GraphMonad {
   induce[G : Graph, V : Vertex](Self[G, V], (V) -> Bool) -> G
   remove_vertex[G : Graph, V : Vertex + Eq](Self[G, V], V) -> G
 }
+impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V]
 
 type IntVertex
-
-type Relation
 
 type StringVertex
 
 type ToList
 
-type VertRep
+type UnitVertex
+
+pub type VertRep Error
+impl Vertex for VertRep
 
 // Type aliases
 
 // Traits
-trait Graph
+pub(open) trait Graph {
+  empty() -> Self
+  vertex(VertRep) -> Self
+  overlay(Self, Self) -> Self
+  connect(Self, Self) -> Self
+}
 
-trait Vertex
+pub trait Vertex {
+  extract(VertRep) -> Self
+  rep(Self) -> VertRep
+}
+impl Vertex for Unit
+impl Vertex for Int
+impl Vertex for String
 

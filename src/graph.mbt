@@ -1,19 +1,9 @@
 ///|
-pub trait Graph {
+pub(open) trait Graph {
   empty() -> Self
   vertex(VertRep) -> Self
   overlay(Self, Self) -> Self
   connect(Self, Self) -> Self
-}
-
-test "graph functor" {
-  let a = [1, 2, 3, 4]
-  let x : GraphFunctor[GraphData[Int], Int, Int] = clique(a)
-  let x1 : GraphFunctor[GraphData[Unit], Int, Unit] = clique(a)
-  let y = x.graph_map(fn(p) { p + 100 })
-  let y1 = x1.graph_map(fn(_) { () })
-  inspect!(y, content="(((($e -> 101) -> 102) -> 103) -> 104)")
-  inspect!(y1, content="(((($e -> ()) -> ()) -> ()) -> ())")
 }
 
 ///|
@@ -70,21 +60,21 @@ struct GraphFunctor[G, V, W] {
 }
 
 ///|
-impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with empty(
+pub impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with empty(
 
 ) {
   { g_for: fn(_) { G::empty() } }
 }
 
 ///|
-impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with vertex(
+pub impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with vertex(
   x
 ) {
   { g_for: fn(f) { G::vertex(W::rep(f(V::extract(x)))) } }
 }
 
 ///|
-impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with overlay(
+pub impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with overlay(
   x,
   y
 ) {
@@ -92,7 +82,7 @@ impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with ove
 }
 
 ///|
-impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with connect(
+pub impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with connect(
   x,
   y
 ) {
@@ -100,7 +90,7 @@ impl[W : Vertex, V : Vertex, G : Graph] Graph for GraphFunctor[G, V, W] with con
 }
 
 ///|
-fn graph_map[G : Graph, V : Vertex, W : Vertex](
+pub fn graph_map[G : Graph, V : Vertex, W : Vertex](
   self : GraphFunctor[G, V, W],
   f : (V) -> W
 ) -> G {
@@ -118,38 +108,23 @@ pub fn bind[G : Graph, V : Vertex](self : GraphMonad[G, V], f : (V) -> G) -> G {
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with empty() {
+pub impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with empty() {
   { bind: fn(_) { G::empty() } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with vertex(x) {
+pub impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with vertex(x) {
   { bind: fn(f) { f(V::extract(x)) } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with overlay(x, y) {
+pub impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with overlay(x, y) {
   { bind: fn(f) { G::overlay(x.bind(f), y.bind(f)) } }
 }
 
 ///|
-impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with connect(x, y) {
+pub impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with connect(x, y) {
   { bind: fn(f) { G::connect(x.bind(f), y.bind(f)) } }
-}
-
-test "graph monad" {
-  let x = [1, 2, 3, 4]
-  let y : GraphMonad[GraphData[Int], Int] = clique(x)
-  let z = y.bind(fn(v) { vertices([v, v - 1, v + 1]) })
-  let w = y.bind(fn(v) { clique([v, v + 1, v + 2]) })
-  inspect!(
-    z,
-    content="(((($e -> $e + 1 + 0 + 2) -> $e + 2 + 1 + 3) -> $e + 3 + 2 + 4) -> $e + 4 + 3 + 5)",
-  )
-  inspect!(
-    w,
-    content="(((($e -> ((($e -> 1) -> 2) -> 3)) -> ((($e -> 2) -> 3) -> 4)) -> ((($e -> 3) -> 4) -> 5)) -> ((($e -> 4) -> 5) -> 6))",
-  )
 }
 
 ///|
@@ -158,13 +133,6 @@ pub fn induce[G : Graph, V : Vertex](
   pred : (V) -> Bool
 ) -> G {
   self.bind(fn(v) { if pred(v) { G::vertex(v.rep()) } else { Graph::empty() } })
-}
-
-test "induce" {
-  let x = [1, 2, 3, 4]
-  let y : GraphMonad[GraphData[Int], Int] = clique(x)
-  let z = y.induce(fn(v) { v % 2 == 0 })
-  inspect!(z, content="(((($e -> $e) -> 2) -> $e) -> 4)")
 }
 
 ///|
