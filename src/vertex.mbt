@@ -45,6 +45,15 @@ impl Vertex for Int with extract(self) {
 ///|
 impl Vertex for Int with rep(self) { VertRep(IntVertex(self)) }
 
+///|
+type! UnitVertex Unit
+
+///|
+impl Vertex for Unit with extract(_) { () }
+
+///|
+impl Vertex for Unit with rep(_) { VertRep(UnitVertex(())) }
+
 test "string vertex" {
   let x : Array[String] = ["a", "b", "c"]
   let y : GraphData[String] = vertices(x)

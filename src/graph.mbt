@@ -11,7 +11,7 @@ test "graph functor" {
   let x : GraphFunctor[GraphData[Int], Int, Int] = clique(a)
   let x1 : GraphFunctor[GraphData[Unit], Int, Unit] = clique(a)
   let y = x.graph_map(fn(p) { p + 100 })
-  let y1 = x1.graph_map(fn(p) { () })
+  let y1 = x1.graph_map(fn(_) { () })
   inspect!(y, content="(((($e -> 101) -> 102) -> 103) -> 104)")
   inspect!(y1, content="(((($e -> ()) -> ()) -> ()) -> ())")
 }
@@ -137,12 +137,34 @@ impl[V : Vertex, G : Graph] Graph for GraphMonad[G, V] with connect(x, y) {
   { bind: fn(f) { G::connect(x.bind(f), y.bind(f)) } }
 }
 
+test "graph monad" {
+  let x = [1, 2, 3, 4]
+  let y : GraphMonad[GraphData[Int], Int] = clique(x)
+  let z = y.bind(fn(v) { vertices([v, v - 1, v + 1]) })
+  let w = y.bind(fn(v) { clique([v, v + 1, v + 2]) })
+  inspect!(
+    z,
+    content="(((($e -> $e + 1 + 0 + 2) -> $e + 2 + 1 + 3) -> $e + 3 + 2 + 4) -> $e + 4 + 3 + 5)",
+  )
+  inspect!(
+    w,
+    content="(((($e -> ((($e -> 1) -> 2) -> 3)) -> ((($e -> 2) -> 3) -> 4)) -> ((($e -> 3) -> 4) -> 5)) -> ((($e -> 4) -> 5) -> 6))",
+  )
+}
+
 ///|
 pub fn induce[G : Graph, V : Vertex](
   self : GraphMonad[G, V],
   pred : (V) -> Bool
 ) -> G {
   self.bind(fn(v) { if pred(v) { G::vertex(v.rep()) } else { Graph::empty() } })
+}
+
+test "induce" {
+  let x = [1, 2, 3, 4]
+  let y : GraphMonad[GraphData[Int], Int] = clique(x)
+  let z = y.induce(fn(v) { v % 2 == 0 })
+  inspect!(z.simple_rewrite(), content="(($e -> 2) -> 4)")
 }
 
 ///|

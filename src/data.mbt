@@ -49,6 +49,11 @@ pub fn overlay[A](a : GraphData[A], b : GraphData[A]) -> GraphData[A] {
 }
 
 ///|
+pub fn connect[A](a : GraphData[A], b : GraphData[A]) -> GraphData[A] {
+  Connect(a, b)
+}
+
+///|
 pub fn fold[A : Graph, V : Vertex](self : GraphData[V]) -> A {
   match self {
     Vertex(v) => Graph::vertex(v.rep())
